@@ -26,6 +26,16 @@ jobs:
         run: |
           swift build -c release
 
+      - name: Generate App Icon
+        working-directory: PipeWatch
+        run: |
+          # Install librsvg for SVG to PNG conversion
+          brew install librsvg
+          
+          # Generate icon
+          chmod +x generate-icon.sh
+          ./generate-icon.sh
+
       - name: Create App Bundle
         working-directory: PipeWatch
         run: |
@@ -41,6 +51,12 @@ jobs:
           
           # Copy Info.plist
           cp "Sources/Resources/Info.plist" "$APP_NAME.app/Contents/"
+          
+          # Copy icon if it exists
+          if [ -f "Sources/Resources/AppIcon.icns" ]; then
+              cp "Sources/Resources/AppIcon.icns" "$APP_NAME.app/Contents/Resources/"
+              echo "🎨 App icon included"
+          fi
           
           # Create PkgInfo
           echo -n "APPL????" > "$APP_NAME.app/Contents/PkgInfo"
