@@ -102,11 +102,19 @@ jobs:
         uses: softprops/action-gh-release@v2
         with:
           name: PipeWatch ${{ github.ref_name }}
+          body: |
+            ## PipeWatch ${{ github.ref_name }}
+            
+            Monitor your CI/CD pipelines from your macOS menu bar.
+            
+            ### Download
+            - **DMG**: Recommended for most users
+            - **ZIP**: Contains the .app bundle directly
+            
+            ### Requirements
+            - macOS 14.0 (Sonoma) or later
           draft: false
           prerelease: false
-          generate_release_notes: true
           files: |
             PipeWatch/PipeWatch-${{ github.ref_name }}.dmg
             PipeWatch/PipeWatch-${{ github.ref_name }}.zip
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
