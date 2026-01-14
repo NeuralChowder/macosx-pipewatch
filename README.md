@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="PipeWatch/docs/icon.png" width="128" height="128" alt="PipeWatch Icon">
+  <img src="PipeWatch/docs/icon.svg" width="128" height="128" alt="PipeWatch Icon">
 </p>
 
 <h1 align="center">PipeWatch</h1>
@@ -20,6 +20,7 @@
   <img src="https://img.shields.io/badge/macOS-14.0+-007AFF?style=flat-square&logo=apple&logoColor=white" alt="macOS 14.0+">
   <img src="https://img.shields.io/badge/Swift-5.9+-F05138?style=flat-square&logo=swift&logoColor=white" alt="Swift 5.9+">
   <img src="https://img.shields.io/badge/License-MIT-green?style=flat-square" alt="MIT License">
+  <img src="https://github.com/NeuralChowder/macosx-pipewatch/actions/workflows/release.yml/badge.svg" alt="Build Status">
 </p>
 
 ---
@@ -40,7 +41,11 @@
 
 🔒 **Secure** — Tokens stored in macOS Keychain
 
-🔌 **Extensible** — Architecture ready for GitLab/Bitbucket support
+� **Launch at Login** — Optionally start PipeWatch when you log in
+
+🛡️ **Single Instance** — Prevents duplicate app instances from running
+
+�🔌 **Extensible** — Architecture ready for GitLab/Bitbucket support
 
 ---
 
@@ -53,13 +58,13 @@
 
 ### Download
 
-Download the latest release from the [Releases](https://github.com/yourusername/pipewatch/releases) page.
+Download the latest release from the [Releases](https://github.com/NeuralChowder/macosx-pipewatch/releases) page.
 
 ### Build from Source
 
 ```bash
-git clone https://github.com/yourusername/pipewatch.git
-cd pipewatch/PipeWatch
+git clone https://github.com/NeuralChowder/macosx-pipewatch.git
+cd macosx-pipewatch/PipeWatch
 swift build -c release
 ```
 

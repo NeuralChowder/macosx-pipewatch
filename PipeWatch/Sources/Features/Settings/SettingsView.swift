@@ -407,6 +407,14 @@ struct GeneralSettingsView: View {
             }
             
             Section {
+                Toggle("Launch at login", isOn: $appState.launchAtLogin)
+            } header: {
+                Text("Startup")
+            } footer: {
+                Text("Automatically start PipeWatch when you log in to your Mac")
+            }
+            
+            Section {
                 LabeledContent("Version", value: "1.0.0")
                 LabeledContent("Minimum macOS", value: "13.0")
                 
@@ -432,6 +440,17 @@ struct GeneralSettingsView: View {
         .onChange(of: appState.showNotifications) { _, _ in
             appState.saveSettings()
             pipelineMonitor.showNotifications = appState.showNotifications
+        }
+        .onChange(of: appState.launchAtLogin) { _, newValue in
+            do {
+                try LaunchAtLoginService.shared.setEnabled(newValue)
+            } catch {
+                print("Failed to set launch at login: \(error)")
+                // Revert the toggle if it failed
+                Task { @MainActor in
+                    appState.launchAtLogin = LaunchAtLoginService.shared.isEnabled
+                }
+            }
         }
     }
 }

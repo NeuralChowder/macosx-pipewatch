@@ -10,11 +10,14 @@ class AppState: ObservableObject {
     @Published var refreshInterval: TimeInterval = 60
     @Published var showNotifications: Bool = true
     @Published var filterDays: Int = 3
+    @Published var launchAtLogin: Bool = false
     
     private let settingsRepository = SettingsRepository()
     
     init() {
         loadSettings()
+        // Sync launch at login state from system
+        launchAtLogin = LaunchAtLoginService.shared.isEnabled
     }
     
     func loadSettings() {

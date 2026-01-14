@@ -223,9 +223,10 @@ struct MenuBarView: View {
                 Spacer()
                 
                 Button {
-                    // Get AppDelegate and open main window
-                    if let appDelegate = NSApp.delegate as? AppDelegate {
-                        appDelegate.openMainWindow()
+                    // Close popover and open main window via notifications
+                    NotificationCenter.default.post(name: .closePopover, object: nil)
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.15) {
+                        NotificationCenter.default.post(name: .openMainWindow, object: nil)
                     }
                 } label: {
                     Label("View All", systemImage: "list.bullet")

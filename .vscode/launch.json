@@ -4,7 +4,7 @@
             "type": "swift",
             "request": "launch",
             "args": [],
-            "cwd": "${workspaceFolder:PipeWatch}",
+            "cwd": "${workspaceFolder:macosx-pipewatch}/PipeWatch",
             "name": "Debug Pipe Watch",
             "target": "Pipe Watch",
             "configuration": "debug",
@@ -14,28 +14,8 @@
             "type": "swift",
             "request": "launch",
             "args": [],
-            "cwd": "${workspaceFolder:PipeWatch}",
+            "cwd": "${workspaceFolder:macosx-pipewatch}/PipeWatch",
             "name": "Release Pipe Watch",
-            "target": "Pipe Watch",
-            "configuration": "release",
-            "preLaunchTask": "swift: Build Release Pipe Watch (PipeWatch)"
-        },
-        {
-            "type": "swift",
-            "request": "launch",
-            "args": [],
-            "cwd": "${workspaceFolder:macosx-pipewatch}/PipeWatch",
-            "name": "Debug Pipe Watch (PipeWatch)",
-            "target": "Pipe Watch",
-            "configuration": "debug",
-            "preLaunchTask": "swift: Build Debug Pipe Watch (PipeWatch)"
-        },
-        {
-            "type": "swift",
-            "request": "launch",
-            "args": [],
-            "cwd": "${workspaceFolder:macosx-pipewatch}/PipeWatch",
-            "name": "Release Pipe Watch (PipeWatch)",
             "target": "Pipe Watch",
             "configuration": "release",
             "preLaunchTask": "swift: Build Release Pipe Watch (PipeWatch)"
