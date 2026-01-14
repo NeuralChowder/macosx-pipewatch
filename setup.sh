@@ -37,7 +37,7 @@ echo ""
 echo "Building PipeWatch..."
 swift build -c release
 
-if [ $? -eq 0 ]; then
+if swift build -c release; then
     echo "✓ Build successful!"
     echo ""
     echo "Next steps:"

@@ -17,6 +17,15 @@ struct WorkflowRun: Codable, Identifiable {
     let updatedAt: Date
     let headBranch: String
     let event: String
+    let repository: RepositoryInfo?
+    
+    struct RepositoryInfo: Codable {
+        let fullName: String
+        
+        enum CodingKeys: String, CodingKey {
+            case fullName = "full_name"
+        }
+    }
     
     enum CodingKeys: String, CodingKey {
         case id
@@ -28,6 +37,7 @@ struct WorkflowRun: Codable, Identifiable {
         case updatedAt = "updated_at"
         case headBranch = "head_branch"
         case event
+        case repository
     }
     
     init(from decoder: Decoder) throws {
@@ -39,6 +49,7 @@ struct WorkflowRun: Codable, Identifiable {
         updatedAt = try container.decode(Date.self, forKey: .updatedAt)
         headBranch = try container.decode(String.self, forKey: .headBranch)
         event = try container.decode(String.self, forKey: .event)
+        repository = try container.decodeIfPresent(RepositoryInfo.self, forKey: .repository)
         
         // Parse status
         let statusString = try container.decode(String.self, forKey: .status)
@@ -59,6 +70,13 @@ struct WorkflowRun: Codable, Identifiable {
         } else {
             status = .unknown
         }
+    }
+    
+    var workflowKey: String {
+        if let repo = repository?.fullName {
+            return "\(repo)/\(name)"
+        }
+        return name
     }
 }
 

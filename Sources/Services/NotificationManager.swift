@@ -43,7 +43,8 @@ class NotificationManager: NSObject {
     
     func checkForFailuresAndNotify(workflows: [WorkflowRun]) {
         for workflow in workflows {
-            let previousStatus = previousStates[workflow.name]
+            let workflowKey = workflow.workflowKey
+            let previousStatus = previousStates[workflowKey]
             
             // Check for new failure
             if workflow.status == .failure && previousStatus != .failure {
@@ -64,7 +65,7 @@ class NotificationManager: NSObject {
             }
             
             // Update state
-            previousStates[workflow.name] = workflow.status
+            previousStates[workflowKey] = workflow.status
         }
     }
 }

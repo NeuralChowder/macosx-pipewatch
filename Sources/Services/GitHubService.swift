@@ -9,6 +9,8 @@ class GitHubService {
     private let token: String
     private let session: URLSession
     private var repositories: [Repository] = []
+    private let maxRepositoryCount = 10
+    private let syncQueue = DispatchQueue(label: "com.pipewatch.github-service", attributes: .concurrent)
     weak var delegate: GitHubServiceDelegate?
     
     init(token: String) {
@@ -31,12 +33,15 @@ class GitHubService {
         }
         
         var allWorkflows: [WorkflowRun] = []
+        let workflowsLock = NSLock()
         let group = DispatchGroup()
         
         for repo in repositories {
             group.enter()
             fetchWorkflowRuns(for: repo) { workflows in
+                workflowsLock.lock()
                 allWorkflows.append(contentsOf: workflows)
+                workflowsLock.unlock()
                 group.leave()
             }
         }
@@ -89,13 +94,14 @@ class GitHubService {
         var latestWorkflows: [String: WorkflowRun] = [:]
         
         for workflow in workflows {
-            if let existing = latestWorkflows[workflow.name] {
+            let key = workflow.workflowKey
+            if let existing = latestWorkflows[key] {
                 // Keep the most recent one
                 if workflow.updatedAt > existing.updatedAt {
-                    latestWorkflows[workflow.name] = workflow
+                    latestWorkflows[key] = workflow
                 }
             } else {
-                latestWorkflows[workflow.name] = workflow
+                latestWorkflows[key] = workflow
             }
         }
         
@@ -124,7 +130,7 @@ class GitHubService {
                 let decoder = JSONDecoder()
                 if let repos = try? decoder.decode([GitHubRepository].self, from: data) {
                     let repositories = repos.map { Repository(owner: $0.owner.login, name: $0.name) }
-                    self?.repositories = Array(repositories.prefix(10)) // Limit to first 10
+                    self?.repositories = Array(repositories.prefix(self?.maxRepositoryCount ?? 10))
                     self?.saveRepositories()
                     
                     // Now fetch workflows

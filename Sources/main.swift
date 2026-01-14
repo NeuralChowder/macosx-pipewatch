@@ -10,6 +10,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var notificationManager: NotificationManager?
     var workflowViewModel: WorkflowViewModel?
     
+    private let refreshInterval: TimeInterval = 60.0 // Refresh every 60 seconds
+    
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Set up the app to run as a menu bar app (LSUIElement = true would be in Info.plist)
         NSApp.setActivationPolicy(.accessory)
@@ -121,8 +123,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         workflowViewModel?.gitHubService = gitHubService
         gitHubService?.fetchWorkflowRuns()
         
-        // Set up periodic refresh (every 60 seconds)
-        Timer.scheduledTimer(withTimeInterval: 60.0, repeats: true) { [weak self] _ in
+        // Set up periodic refresh
+        Timer.scheduledTimer(withTimeInterval: refreshInterval, repeats: true) { [weak self] _ in
             self?.gitHubService?.fetchWorkflowRuns()
         }
     }

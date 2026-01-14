@@ -15,7 +15,10 @@ final class WorkflowRunTests: XCTestCase {
             "created_at": "2026-01-14T10:00:00Z",
             "updated_at": "2026-01-14T10:05:00Z",
             "head_branch": "main",
-            "event": "push"
+            "event": "push",
+            "repository": {
+                "full_name": "test/repo"
+            }
         }
         """
         
@@ -27,6 +30,7 @@ final class WorkflowRunTests: XCTestCase {
         
         XCTAssertEqual(successWorkflow.status, .success)
         XCTAssertEqual(successWorkflow.name, "CI")
+        XCTAssertEqual(successWorkflow.workflowKey, "test/repo/CI")
     }
     
     func testFailedWorkflowDecoding() throws {
@@ -40,7 +44,10 @@ final class WorkflowRunTests: XCTestCase {
             "created_at": "2026-01-14T10:00:00Z",
             "updated_at": "2026-01-14T10:05:00Z",
             "head_branch": "feature-branch",
-            "event": "pull_request"
+            "event": "pull_request",
+            "repository": {
+                "full_name": "test/repo"
+            }
         }
         """
         
@@ -76,10 +83,37 @@ final class WorkflowRunTests: XCTestCase {
         let inProgressWorkflow = try decoder.decode(WorkflowRun.self, from: inProgressData)
         
         XCTAssertEqual(inProgressWorkflow.status, .inProgress)
+        XCTAssertEqual(inProgressWorkflow.workflowKey, "Build") // No repository, falls back to name
     }
     
     func testRepositoryFullName() {
         let repo = Repository(owner: "testuser", name: "testrepo")
         XCTAssertEqual(repo.fullName, "testuser/testrepo")
+    }
+    
+    func testWorkflowKeyWithRepository() throws {
+        let jsonWithRepo = """
+        {
+            "id": 1,
+            "name": "CI",
+            "status": "completed",
+            "conclusion": "success",
+            "html_url": "https://github.com/test/repo/actions/runs/1",
+            "created_at": "2026-01-14T10:00:00Z",
+            "updated_at": "2026-01-14T10:05:00Z",
+            "head_branch": "main",
+            "event": "push",
+            "repository": {
+                "full_name": "owner/repo"
+            }
+        }
+        """
+        
+        let decoder = JSONDecoder()
+        decoder.dateDecodingStrategy = .iso8601
+        let data = jsonWithRepo.data(using: .utf8)!
+        let workflow = try decoder.decode(WorkflowRun.self, from: data)
+        
+        XCTAssertEqual(workflow.workflowKey, "owner/repo/CI")
     }
 }
