@@ -8,6 +8,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     var gitHubService: GitHubService?
     var keychainService: KeychainService?
     var notificationManager: NotificationManager?
+    var workflowViewModel: WorkflowViewModel?
     
     func applicationDidFinishLaunching(_ notification: Notification) {
         // Set up the app to run as a menu bar app (LSUIElement = true would be in Info.plist)
@@ -16,6 +17,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         // Initialize services
         keychainService = KeychainService()
         notificationManager = NotificationManager()
+        workflowViewModel = WorkflowViewModel(gitHubService: nil)
         
         // Create status bar item
         statusItem = NSStatusBar.system.statusItem(withLength: NSStatusItem.variableLength)
@@ -116,6 +118,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     func startMonitoring(with token: String) {
         gitHubService = GitHubService(token: token)
         gitHubService?.delegate = self
+        workflowViewModel?.gitHubService = gitHubService
         gitHubService?.fetchWorkflowRuns()
         
         // Set up periodic refresh (every 60 seconds)
@@ -155,12 +158,17 @@ class AppDelegate: NSObject, NSApplicationDelegate {
 
 extension AppDelegate: GitHubServiceDelegate {
     func didUpdateWorkflows(_ workflows: [WorkflowRun]) {
+        // Update the view model
+        DispatchQueue.main.async { [weak self] in
+            self?.workflowViewModel?.updateWorkflows(workflows)
+        }
+        
         // Determine overall status
         let overallStatus = calculateOverallStatus(workflows)
         updateStatusIcon(status: overallStatus)
         
-        // Check for failures and send notifications
-        checkForFailures(workflows)
+        // Check for failures and recoveries, send notifications
+        notificationManager?.checkForFailuresAndNotify(workflows: workflows)
     }
     
     func didFailWithError(_ error: Error) {
@@ -177,16 +185,6 @@ extension AppDelegate: GitHubServiceDelegate {
             return .inProgress
         } else {
             return .success
-        }
-    }
-    
-    private func checkForFailures(_ workflows: [WorkflowRun]) {
-        for workflow in workflows where workflow.status == .failure {
-            notificationManager?.sendNotification(
-                title: "Build Failed",
-                body: "\(workflow.name) failed",
-                url: workflow.htmlURL
-            )
         }
     }
 }

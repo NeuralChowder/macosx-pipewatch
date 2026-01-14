@@ -1,9 +1,10 @@
 import Foundation
 import UserNotifications
+import AppKit
 
 class NotificationManager: NSObject {
     private let notificationCenter = UNUserNotificationCenter.current()
-    private var previousFailures: Set<Int> = []
+    private var previousStates: [String: WorkflowStatus] = [:] // workflow name -> status
     
     override init() {
         super.init()
@@ -41,34 +42,30 @@ class NotificationManager: NSObject {
     }
     
     func checkForFailuresAndNotify(workflows: [WorkflowRun]) {
-        let currentFailures = Set(workflows.filter { $0.status == .failure }.map { $0.id })
-        let currentSuccesses = Set(workflows.filter { $0.status == .success }.map { $0.id })
-        
-        // Check for new failures
-        let newFailures = currentFailures.subtracting(previousFailures)
-        for failureId in newFailures {
-            if let workflow = workflows.first(where: { $0.id == failureId }) {
+        for workflow in workflows {
+            let previousStatus = previousStates[workflow.name]
+            
+            // Check for new failure
+            if workflow.status == .failure && previousStatus != .failure {
                 sendNotification(
                     title: "Build Failed ❌",
                     body: "\(workflow.name) on \(workflow.headBranch)",
                     url: workflow.htmlURL
                 )
             }
-        }
-        
-        // Check for recoveries (was failing, now success)
-        let recoveries = previousFailures.intersection(currentSuccesses)
-        for recoveryId in recoveries {
-            if let workflow = workflows.first(where: { $0.id == recoveryId }) {
+            
+            // Check for recovery
+            if workflow.status == .success && previousStatus == .failure {
                 sendNotification(
                     title: "Build Recovered ✅",
                     body: "\(workflow.name) on \(workflow.headBranch) is now passing",
                     url: workflow.htmlURL
                 )
             }
+            
+            // Update state
+            previousStates[workflow.name] = workflow.status
         }
-        
-        previousFailures = currentFailures
     }
 }
 

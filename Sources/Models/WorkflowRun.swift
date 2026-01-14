@@ -72,12 +72,28 @@ struct WorkflowRunsResponse: Codable {
     }
 }
 
-struct Repository: Codable, Identifiable {
-    let id = UUID()
+struct Repository: Codable, Identifiable, Equatable {
+    let id: UUID
     let owner: String
     let name: String
     
     var fullName: String {
         "\(owner)/\(name)"
+    }
+    
+    init(owner: String, name: String) {
+        self.id = UUID()
+        self.owner = owner
+        self.name = name
+    }
+    
+    enum CodingKeys: String, CodingKey {
+        case id
+        case owner
+        case name
+    }
+    
+    static func == (lhs: Repository, rhs: Repository) -> Bool {
+        lhs.owner == rhs.owner && lhs.name == rhs.name
     }
 }

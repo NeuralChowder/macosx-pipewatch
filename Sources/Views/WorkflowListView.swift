@@ -1,8 +1,28 @@
 import SwiftUI
 
+class WorkflowViewModel: ObservableObject {
+    @Published var workflows: [WorkflowRun] = []
+    var gitHubService: GitHubService?
+    
+    init(gitHubService: GitHubService?) {
+        self.gitHubService = gitHubService
+    }
+    
+    func refresh() {
+        gitHubService?.fetchWorkflowRuns()
+    }
+    
+    func updateWorkflows(_ workflows: [WorkflowRun]) {
+        self.workflows = workflows
+    }
+}
+
 struct WorkflowListView: View {
-    @State private var workflows: [WorkflowRun] = []
-    let gitHubService: GitHubService?
+    @StateObject private var viewModel: WorkflowViewModel
+    
+    init(gitHubService: GitHubService?) {
+        _viewModel = StateObject(wrappedValue: WorkflowViewModel(gitHubService: gitHubService))
+    }
     
     var body: some View {
         VStack(spacing: 0) {
@@ -12,7 +32,7 @@ struct WorkflowListView: View {
                     .font(.headline)
                     .fontWeight(.bold)
                 Spacer()
-                Button(action: refresh) {
+                Button(action: { viewModel.refresh() }) {
                     Image(systemName: "arrow.clockwise")
                 }
                 .buttonStyle(.plain)
@@ -23,7 +43,7 @@ struct WorkflowListView: View {
             Divider()
             
             // Workflow list
-            if workflows.isEmpty {
+            if viewModel.workflows.isEmpty {
                 VStack(spacing: 12) {
                     Image(systemName: "tray")
                         .font(.system(size: 48))
@@ -39,7 +59,7 @@ struct WorkflowListView: View {
             } else {
                 ScrollView {
                     LazyVStack(spacing: 0) {
-                        ForEach(workflows) { workflow in
+                        ForEach(viewModel.workflows) { workflow in
                             WorkflowRowView(workflow: workflow)
                                 .onTapGesture {
                                     openInBrowser(workflow.htmlURL)
@@ -50,10 +70,6 @@ struct WorkflowListView: View {
             }
         }
         .frame(width: 400, height: 500)
-    }
-    
-    private func refresh() {
-        gitHubService?.fetchWorkflowRuns()
     }
     
     private func openInBrowser(_ urlString: String) {
