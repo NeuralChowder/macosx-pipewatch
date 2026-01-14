@@ -26,6 +26,12 @@ cp ".build/release/$APP_NAME" "$APP_NAME.app/Contents/MacOS/"
 # Copy Info.plist
 cp "Sources/Resources/Info.plist" "$APP_NAME.app/Contents/"
 
+# Copy icon if it exists
+if [ -f "Sources/Resources/AppIcon.icns" ]; then
+    cp "Sources/Resources/AppIcon.icns" "$APP_NAME.app/Contents/Resources/"
+    echo "🎨 App icon included"
+fi
+
 # Create PkgInfo
 echo -n "APPL????" > "$APP_NAME.app/Contents/PkgInfo"
 

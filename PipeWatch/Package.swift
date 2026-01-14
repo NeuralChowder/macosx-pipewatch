@@ -22,7 +22,7 @@ let package = Package(
             name: "PipeWatch",
             dependencies: ["KeychainAccess"],
             path: "Sources",
-            exclude: ["Resources/Info.plist", "Resources/PipeWatch.entitlements"]
+            exclude: ["Resources/Info.plist", "Resources/PipeWatch.entitlements", "Resources/AppIcon.icns"]
         )
     ]
 )
