@@ -1,0 +1,30 @@
+# Swift Package Manager
+.build/
+.swiftpm/
+Package.resolved
+
+# Xcode
+*.xcodeproj/
+*.xcworkspace/
+xcuserdata/
+DerivedData/
+*.xcuserstate
+
+# macOS
+.DS_Store
+*.app
+
+# Build artifacts
+*.dmg
+*.pkg
+*.zip
+
+# IDE
+.idea/
+*.swp
+*~
+
+# Certificates (keep these private!)
+*.p12
+*.mobileprovision
+*.provisionprofile
