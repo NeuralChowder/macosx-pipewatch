@@ -1,0 +1,26 @@
+name: macOS Build
+
+on:
+  push:
+    branches: [ main, copilot/* ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build:
+    runs-on: macos-13
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+    
+    - name: Set up Swift
+      uses: swift-actions/setup-swift@v1
+      with:
+        swift-version: '5.9'
+    
+    - name: Build
+      run: swift build -c release
+    
+    - name: Run tests
+      run: swift test
